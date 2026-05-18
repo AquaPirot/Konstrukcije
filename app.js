@@ -10,11 +10,11 @@ let val = {};
 // Polja po tipu
 const POLJA = {
   stub: [
-    { id: 'nStubova',  label: 'Broj stubova',    unit: 'kom', def: 3,   min: 2,  max: 10, step: 1 },
-    { id: 'razmak',    label: 'Razmak (c-c)',     unit: 'cm',  def: 150, min: 30, max: 600 },
-    { id: 'visina',    label: 'Visina stuba',     unit: 'cm',  def: 250, min: 30, max: 600 },
-    { id: 'profStub',  label: 'Profil stuba',     unit: '',    def: '100x100', tip: 'select', opcije: ['100x100', '80x40'] },
-    { id: 'profGreda', label: 'Profil grede',     unit: '',    def: '100x100', tip: 'select', opcije: ['100x100', '80x40'] },
+    { id: 'nStubova',    label: 'Broj stubova',      unit: 'kom', def: 3,   min: 2,  max: 10, step: 1 },
+    { id: 'sirinaGrede', label: 'Širina grede',       unit: 'cm',  def: 300, min: 50, max: 2000 },
+    { id: 'visina',      label: 'Visina stuba',       unit: 'cm',  def: 250, min: 30, max: 600 },
+    { id: 'profStub',    label: 'Profil stuba',       unit: '',    def: '100x100', tip: 'select', opcije: ['100x100', '80x40'] },
+    { id: 'profGreda',   label: 'Profil grede',       unit: '',    def: '100x100', tip: 'select', opcije: ['100x100', '80x40'] },
   ],
   lkonzola: [
     { id: 'nNosaca',   label: 'Broj L nosača',    unit: 'kom', def: 3,  min: 2,  max: 10, step: 1 },
@@ -125,59 +125,56 @@ const DEFS = `<defs>
 
 // ── SVG: STUB + GREDA ─────────────────────────────────
 function svgStub() {
-  const { nStubova: N, razmak: SP, visina: H, profStub, profGreda } = val;
-  const sw = profStub === '100x100' ? 10 : 8;   // širina profila stuba (cm)
-  const sh = profStub === '100x100' ? 10 : 4;   // visina profila stuba (h u pogledu je debljina)
-  const gw = profGreda === '100x100' ? 10 : 8;  // visina grede
-  const ukW = (N-1) * SP;  // ukupna širina
+  const { nStubova: N, sirinaGrede: SG, visina: H, profStub, profGreda } = val;
+  const sw = profStub === '100x100' ? 10 : 8;
+  const gw = profGreda === '100x100' ? 10 : 8;
+  const SP = (N > 1) ? (SG - sw) / (N - 1) : 0;  // razmak c-c izmedju stubova
+  const stopaW = 15, stopaH = 2;                   // stopa 150×150mm, debljina 20mm
 
-  const MX = 60, MY = 50;  // margine
-  const GY = MY + H;        // y koordinata tla
-  const GredaY = MY;        // greda na vrhu
+  const MX = 65, MY = 50;
+  const GY = MY + H;      // nivo tla (vrh stope)
+  const GredaY = MY;
 
-  const vbW = MX + ukW + MX + 30;
-  const vbH = MY + H + gw + 50;
+  const vbW = MX + SG + MX + 30;
+  const vbH = MY + H + stopaH + 45;
 
   let s = DEFS;
 
-  // Tlo
-  s += l(MX - 10, GY, MX + ukW + 10, GY, '#555', 1.5);
-  // Tlo šrafe
-  for (let i = 0; i <= Math.floor((ukW+20)/12); i++) {
-    s += l(MX - 10 + i*12, GY, MX - 20 + i*12, GY+10, '#aaa', 0.6);
+  // Tlo linija + šrafe
+  s += l(MX - 15, GY + stopaH, MX + SG + 15, GY + stopaH, '#555', 1.5);
+  for (let i = 0; i <= Math.floor((SG + 30) / 12); i++) {
+    s += l(MX - 15 + i*12, GY + stopaH, MX - 25 + i*12, GY + stopaH + 10, '#aaa', 0.6);
   }
 
-  // Greda (ide od prvog do poslednjeg stuba, na vrhu)
-  s += r(MX, GredaY, ukW + sw, gw, '#6c7a86', '#2c3e50', 1.5);
+  // Greda (horizontalna, puna širina)
+  s += r(MX, GredaY, SG, gw, '#6c7a86', '#2c3e50', 1.5);
 
-  // Stubovi
+  // Stubovi + stope
   for (let i = 0; i < N; i++) {
     const sx = MX + i * SP;
+    // Stub
     s += r(sx, GredaY + gw, sw, H - gw, '#9eaab5', '#2c3e50', 1.5);
+    // Stopa (širi se 2.5cm sa svake strane)
+    const stopX = sx - (stopaW - sw) / 2;
+    s += r(stopX, GY, stopaW, stopaH, '#6c7a86', '#2c3e50', 1.5);
+    // Ankeri (2 tačke na stopi)
+    s += l(sx + sw*0.25, GY, sx + sw*0.25, GY + stopaH + 5, '#c0392b', 1, '2 2');
+    s += l(sx + sw*0.75, GY, sx + sw*0.75, GY + stopaH + 5, '#c0392b', 1, '2 2');
   }
 
   // Kote
-  // Visina stuba
-  s += kotaV(MX - 25, GredaY + gw, GY, `${H - gw} cm`, false);
-  // Ukupna širina
-  s += kotaH(MX, MX + ukW + sw, GY + 28, `${ukW + sw} cm`, false);
-  // Razmak stubova (ako ima više od 2)
+  s += kotaV(MX - 30, GredaY + gw, GY, `${f(H - gw)} cm`, false);
+  s += kotaH(MX, MX + SG, GY + stopaH + 22, `${SG} cm`, false);
   if (N > 1) {
-    s += kotaH(MX, MX + SP, GY + 42, `${SP} cm`, false);
+    s += kotaH(MX, MX + SP, GredaY - 22, `${f(SP)} cm`);
   }
-  // Visina grede
-  s += kotaV(MX + ukW + sw + 20, GredaY, GredaY + gw, `${gw*10} mm`, true);
+  s += kotaV(MX + SG + 22, GredaY, GredaY + gw, `${gw*10} mm`, true);
 
-  // Oznake
-  s += t(MX + ukW/2, MY - 20, 'PREDNJI IZGLED', 9, 'middle', '#1a2634', true);
-  s += t(MX, GY + 16, profStub, 7, 'start', '#6c7a86');
-  s += t(MX + ukW/2, GredaY + gw/2 + 3, profGreda, 7, 'middle', '#fff');
-
-  // Osnov stuba (ankeri)
-  for (let i = 0; i < N; i++) {
-    const sx = MX + i * SP;
-    s += r(sx - 4, GY - 2, sw + 8, 4, '#888', '#555', 1);
-  }
+  // Tekstovi
+  s += t(MX + SG/2, MY - 22, 'PREDNJI IZGLED', 9, 'middle', '#1a2634', true);
+  s += t(MX + SG/2, GredaY + gw/2 + 3, `${profGreda} mm`, 7, 'middle', '#fff');
+  s += t(MX + sw + 3, GredaY + gw + H/2, `${profStub} mm`, 7, 'start', '#556');
+  s += t(MX + SG/2, GY + stopaH + 10, 'stopa 150×150 mm', 6, 'middle', '#888');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f(vbW)} ${f(vbH)}">${s}</svg>`;
 }
@@ -253,51 +250,47 @@ function svgLkonzola() {
   // Profil oznaka
   s += t(bx + pw + 4, by + NG/2 + 3, profil, 7, 'start', '#1a2634');
 
-  // ─ PREDNJI POGLED ─
+  // ─ ČEONI POGLED ─
+  // Gledamo u zid – vidimo N noga (vertikalnih cevi) i horizontalnu gredu
+  // Krakovi idu u dubinu, nije vidljivi
+
   const fx = frontX;
   const fy = MY;
+  const ceoniW = ukSpan + pw;
 
-  // Zid (leva strana)
-  s += r(fx - wallW, fy - 10, wallW, sidewH + 20, '#d0d8df', '#8898aa', 1);
-  for (let i = 0; i < 8; i++) {
-    s += l(fx - wallW, fy - 10 + i*16, fx, fy - 10 + i*16 + 16, '#aaa', 0.6);
+  // Zid pozadina
+  s += r(fx - wallW, fy - 10, ceoniW + wallW*2, NG + 20, '#e8ecf0', '#c0cdd6', 0.5);
+  // Šrafura zida (horizontalne linije)
+  for (let i = 0; i <= Math.floor((NG + 30) / 14); i++) {
+    s += l(fx - wallW, fy - 10 + i*14, fx + ceoniW + wallW, fy - 10 + i*14, '#d0d8df', 0.4);
   }
+  s += t(fx + ceoniW/2, fy - 2, 'ZID', 7, 'middle', '#8898a8');
 
-  // Noge svih nosača (vertikalne cevi uz zid)
-  for (let i = 0; i < N; i++) {
-    s += r(fx, fy, pw, NG, '#9eaab5', '#2c3e50', 1.2);
-  }
-  // Prikažemo jednu nogu (sve su na istom mestu u prednjem pogledu)
-  s += r(fx, fy, pw, NG, '#9eaab5', '#2c3e50', 1.5);
-
-  // Greda (horizontalna, na vrhu krakova)
-  s += r(fx, fy, ukSpan + pw, gw, '#6c7a86', '#2c3e50', 1.5);
-
-  // Tačke nosača duž grede
+  // N noga duž zida (vertikalne cevi)
   for (let i = 0; i < N; i++) {
     const nx = fx + i * SP;
-    // Noge su uz zid, ne vidimo ih u prednjem pogledu (idu u dubinu)
-    // Prikazujemo gde greda leži na krakovima
-    s += r(nx, fy, pw, gw, '#4a5a68', '#2c3e50', 1.5);
+    s += r(nx, fy + gw, pw, NG - gw, '#9eaab5', '#2c3e50', 1.5);
+    // Mali profil kraka kao presek iza grede (podsetsnik da krak ide u dubinu)
+    s += r(nx, fy, pw, gw, '#4a5a68', '#2c3e50', 1.2);
   }
 
-  // Kota ukupne dužine
-  s += kotaH(fx, fx + ukSpan + pw, fy + sidewH + 22, `${ukSpan + pw} cm`, false);
-  // Razmak nosača
-  if (N > 1) {
-    s += kotaH(fx, fx + SP, fy + sidewH + 36, `${SP} cm`, false);
-  }
-  // Visina nosača
-  s += kotaV(fx + ukSpan + pw + 22, fy + gw, fy + NG, `${NG - gw} cm`, true);
+  // Horizontalna greda (klizi po krakovima da se dostiže libela)
+  s += r(fx, fy, ukSpan + pw, gw, '#6c7a86', '#2c3e50', 1.8);
+  s += t(fx + ceoniW/2, fy + gw/2 + 3, `${profGreda} mm`, 7, 'middle', '#fff');
 
   // Tlo
-  s += l(fx - wallW - 5, fy + NG, fx + ukSpan + pw + 20, fy + NG, '#555', 1.5);
+  s += l(fx - 10, fy + NG, fx + ceoniW + 10, fy + NG, '#555', 1.5);
+  for (let i = 0; i <= Math.floor((ceoniW + 20) / 12); i++) {
+    s += l(fx - 10 + i*12, fy + NG, fx - 20 + i*12, fy + NG + 10, '#aaa', 0.6);
+  }
 
-  s += t(fx + ukSpan/2 + pw, fy + sidewH + 50, 'PREDNJI POGLED', 9, 'middle', '#1a2634', true);
-  s += t(fx + ukSpan/2 + pw, fy + gw/2 + 3, `Greda ${profGreda}`, 7, 'middle', '#fff');
+  // Kote
+  s += kotaH(fx, fx + ceoniW, fy + NG + 22, `${ceoniW} cm`, false);
+  if (N > 1) s += kotaH(fx, fx + SP, fy + NG + 38, `${SP} cm`, false);
+  s += kotaV(fx + ceoniW + 22, fy + gw, fy + NG, `${NG - gw} cm`, true);
+  s += kotaV(fx - wallW - 16, fy, fy + gw, `${gw*10} mm`, false);
 
-  // Napomena kota - visina grede
-  s += kotaV(fx - wallW - 16, fy, fy + gw, `${gw*10}mm`, false);
+  s += t(fx + ceoniW/2, fy + NG + 54, 'ČEONI POGLED', 9, 'middle', '#1a2634', true);
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${f(vbW)} ${f(vbH)}">${s}</svg>`;
 }
@@ -313,10 +306,12 @@ function materijal() {
   }
 
   if (tip === 'stub') {
-    const { nStubova: N, razmak: SP, visina: H, profStub, profGreda } = val;
-    const ukW = (N-1)*SP + (profStub === '100x100' ? 10 : 8);
-    red('Stub', profStub, N, H + 60);         // +60cm za ukopavanje
-    red('Horizontalna greda', profGreda, 1, ukW);
+    const { nStubova: N, sirinaGrede: SG, visina: H, profStub, profGreda } = val;
+    const sw = profStub === '100x100' ? 10 : 8;
+    const SP = N > 1 ? (SG - sw) / (N - 1) : 0;
+    red('Stub', profStub, N, H);
+    red('Horizontalna greda', profGreda, 1, SG);
+    rows.push({ naziv: 'Stopa 150×150×10 mm', profil: 'pločevina', kom: N, duzinaKom: 0, ukupnoM: 0, kg: N * 1.8 });
   } else {
     const { nNosaca: N, razmak: SP, noga: NG, krak: KR, profil, profGreda } = val;
     const pw = profil === '100x100' ? 10 : 8;
@@ -340,7 +335,8 @@ function materijal() {
 
   rows.forEach(r => {
     if (r.duzinaKom === 0) {
-      html += `<tr><td>${r.naziv}</td><td>—</td><td style="text-align:right">${r.kom}</td><td colspan="3" style="text-align:right;color:#8896a5">—</td></tr>`;
+      totalKg += r.kg;
+      html += `<tr><td>${r.naziv}</td><td style="color:#5a6876;font-weight:700">${r.profil}</td><td style="text-align:right">${r.kom}</td><td style="text-align:right;color:#8896a5">—</td><td style="text-align:right;color:#8896a5">—</td><td style="text-align:right">${r.kg.toFixed(1)}</td></tr>`;
       return;
     }
     totalM += r.ukupnoM;
@@ -362,9 +358,12 @@ function materijal() {
   </tr></tbody></table>`;
 
   if (tip === 'stub') {
-    html += `<p class="napomena">* Stubovi: dužina uključuje +60 cm za ukopavanje ili postavljanje na ploče.<br>* Težine okvirne: 100×100×4 = 11.9 kg/m, 80×40×3 = 5.17 kg/m.</p>`;
+    const { nStubova: N, sirinaGrede: SG, profStub } = val;
+    const sw = profStub === '100x100' ? 10 : 8;
+    const SP = N > 1 ? (SG - sw) / (N - 1) : 0;
+    html += `<p class="napomena">* Razmak stubova (c-c): ${f(SP)} cm<br>* Stopa 150×150×10 mm zavarena na dno stuba, anker vijci M12.<br>* Težine okvirne: 100×100×4 = 11.9 kg/m, 80×40×3 = 5.17 kg/m.</p>`;
   } else {
-    html += `<p class="napomena">* L nosač se izrađuje od jednog profila: noga + krak se zavaruju pod 90°.<br>* Anker vijci: 3 kom po nosaču, M12×150, hemijski ili mehanički anker.<br>* Težine okvirne: 100×100×4 = 11.9 kg/m, 80×40×3 = 5.17 kg/m.</p>`;
+    html += `<p class="napomena">* L nosač: noga + krak zavareni pod 90°. Greda se pomera po krakovima za dotezanje u libelu.<br>* Anker vijci: 3 kom po nosaču, M12×150, hemijski ili mehanički anker.<br>* Težine okvirne: 100×100×4 = 11.9 kg/m, 80×40×3 = 5.17 kg/m.</p>`;
   }
 
   return html;
