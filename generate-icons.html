@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><title>Icon Generator</title></head>
+<body>
+<canvas id="c192" width="192" height="192"></canvas>
+<canvas id="c512" width="512" height="512"></canvas>
+<script>
+function drawIcon(canvas) {
+  const ctx = canvas.getContext('2d');
+  const s = canvas.width;
+  const sc = s / 192;
+  ctx.fillStyle = '#1a2634';
+  ctx.fillRect(0, 0, s, s);
+  ctx.strokeStyle = '#9eaab5';
+  ctx.lineWidth = 8 * sc;
+  // Posts
+  ctx.fillStyle = '#6c7a86';
+  ctx.fillRect(30*sc, 70*sc, 18*sc, 90*sc);
+  ctx.fillRect(144*sc, 70*sc, 18*sc, 90*sc);
+  // Beam
+  ctx.fillStyle = '#9eaab5';
+  ctx.fillRect(24*sc, 50*sc, 144*sc, 18*sc);
+  // Rafters
+  ctx.fillStyle = '#b8c4cc';
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect((30 + i*30)*sc, 28*sc, 8*sc, 24*sc);
+  }
+  canvas.toBlob(blob => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `icon-${s}.png`;
+    a.click();
+  });
+}
+drawIcon(document.getElementById('c192'));
+setTimeout(() => drawIcon(document.getElementById('c512')), 500);
+</script>
+</body>
+</html>
