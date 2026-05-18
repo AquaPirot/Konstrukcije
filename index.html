@@ -2,130 +2,87 @@
 <html lang="sr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Pergola Konstrukcije</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Metalne Konstrukcije</title>
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="style.css">
   <meta name="theme-color" content="#1a2634">
-  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Pergola">
-  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Konstrukcije">
 </head>
 <body>
-  <header class="app-header">
-    <h1>Pergola Konstrukcije</h1>
-    <span class="version">v1.0</span>
+
+  <header>
+    <h1>Metalne Konstrukcije</h1>
   </header>
 
-  <main class="app-main">
+  <main>
 
-    <!-- Tip konstrukcije -->
+    <!-- Tip -->
     <section class="card">
-      <h2>Tip konstrukcije</h2>
-      <div class="type-grid" id="type-selector">
+      <div class="type-row">
 
-        <label class="type-card">
-          <input type="radio" name="type" value="4stuba" checked>
-          <div class="type-icon">
-            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-              <rect x="5" y="14" width="7" height="38" fill="#6c7a86"/>
-              <rect x="68" y="14" width="7" height="38" fill="#6c7a86"/>
-              <rect x="5" y="42" width="70" height="7" fill="#9eaab5"/>
-              <rect x="5" y="6" width="70" height="7" fill="#9eaab5"/>
-              <line x1="20" y1="6" x2="20" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="35" y1="6" x2="35" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="50" y1="6" x2="50" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="65" y1="6" x2="65" y2="13" stroke="#b8c4cc" stroke-width="2"/>
+        <label class="type-btn">
+          <input type="radio" name="tip" value="stub" checked>
+          <div class="type-inner">
+            <svg viewBox="0 0 100 70">
+              <rect x="10" y="12" width="8" height="50" fill="#6c7a86"/>
+              <rect x="46" y="12" width="8" height="50" fill="#6c7a86"/>
+              <rect x="82" y="12" width="8" height="50" fill="#6c7a86"/>
+              <rect x="6"  y="8"  width="88" height="8"  fill="#9eaab5"/>
             </svg>
+            <span>Stub + Greda</span>
+            <small>Vertikalne cevi + horizontalna greda</small>
           </div>
-          <span>4 Stuba</span>
-          <small>Slobodnostojeća</small>
         </label>
 
-        <label class="type-card">
-          <input type="radio" name="type" value="2stuba_zid">
-          <div class="type-icon">
-            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0" y="0" width="7" height="60" fill="#aab0b8"/>
-              <rect x="7" y="4" width="66" height="6" fill="#9eaab5"/>
-              <rect x="7" y="40" width="66" height="6" fill="#9eaab5"/>
-              <rect x="66" y="10" width="7" height="34" fill="#6c7a86"/>
-              <line x1="25" y1="4" x2="25" y2="10" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="40" y1="4" x2="40" y2="10" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="55" y1="4" x2="55" y2="10" stroke="#b8c4cc" stroke-width="2"/>
+        <label class="type-btn">
+          <input type="radio" name="tip" value="lkonzola">
+          <div class="type-inner">
+            <svg viewBox="0 0 100 70">
+              <rect x="0" y="0" width="8" height="70" fill="#b0bec5"/>
+              <rect x="8" y="8"  width="6" height="40" fill="#6c7a86"/>
+              <rect x="8" y="42" width="35" height="6" fill="#6c7a86"/>
+              <rect x="38" y="8" width="6" height="40" fill="#6c7a86"/>
+              <rect x="38" y="42" width="35" height="6" fill="#6c7a86"/>
+              <rect x="68" y="8" width="6" height="40" fill="#6c7a86"/>
+              <rect x="68" y="42" width="26" height="6" fill="#6c7a86"/>
+              <rect x="8" y="42" width="86" height="6" fill="#9eaab5" opacity="0.7"/>
             </svg>
+            <span>L Konzola</span>
+            <small>L nosači na zidu + greda</small>
           </div>
-          <span>Uz Zid</span>
-          <small>2 slobodna stuba</small>
-        </label>
-
-        <label class="type-card">
-          <input type="radio" name="type" value="L">
-          <div class="type-icon">
-            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-              <rect x="5" y="5" width="7" height="50" fill="#6c7a86"/>
-              <rect x="68" y="5" width="7" height="25" fill="#6c7a86"/>
-              <rect x="5" y="5" width="70" height="7" fill="#9eaab5"/>
-              <rect x="5" y="28" width="35" height="7" fill="#9eaab5"/>
-              <rect x="30" y="28" width="7" height="27" fill="#6c7a86"/>
-              <rect x="5" y="48" width="32" height="7" fill="#9eaab5"/>
-            </svg>
-          </div>
-          <span>L-Forma</span>
-          <small>Ugaona konstrukcija</small>
-        </label>
-
-        <label class="type-card">
-          <input type="radio" name="type" value="linijska">
-          <div class="type-icon">
-            <svg viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
-              <rect x="5" y="20" width="7" height="32" fill="#6c7a86"/>
-              <rect x="37" y="20" width="6" height="32" fill="#6c7a86"/>
-              <rect x="68" y="20" width="7" height="32" fill="#6c7a86"/>
-              <rect x="5" y="13" width="70" height="7" fill="#9eaab5"/>
-              <line x1="18" y1="6" x2="18" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="30" y1="6" x2="30" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="50" y1="6" x2="50" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-              <line x1="62" y1="6" x2="62" y2="13" stroke="#b8c4cc" stroke-width="2"/>
-            </svg>
-          </div>
-          <span>Linijska</span>
-          <small>3+ stuba u nizu</small>
         </label>
 
       </div>
     </section>
 
-    <!-- Mere -->
+    <!-- Forma -->
     <section class="card">
-      <h2>Mere i profili</h2>
-      <div class="form-grid" id="dims-form"></div>
+      <h2>Mere</h2>
+      <div id="forma"></div>
     </section>
 
     <!-- Crtez -->
-    <section class="card" id="output-section">
-      <div class="section-header">
-        <h2>Tehnički crtež</h2>
-        <button id="print-btn" onclick="window.print()">⎙ Štampaj / PDF</button>
+    <section class="card">
+      <div class="card-header">
+        <h2>Crtež</h2>
+        <button onclick="window.print()">Štampaj / PDF</button>
       </div>
-      <div id="drawing-container"></div>
+      <div id="crtez"></div>
     </section>
 
     <!-- Materijal -->
-    <section class="card" id="materials-section">
-      <h2>Lista materijala</h2>
-      <div id="materials-container"></div>
+    <section class="card">
+      <h2>Materijal</h2>
+      <div id="materijal"></div>
     </section>
 
   </main>
 
   <script src="app.js"></script>
   <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js');
-    }
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');
   </script>
 </body>
 </html>
